@@ -31,7 +31,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.8-dev
+          python-version: 3.8
 
       - name: Get cache week key
         id: get-cache-week-key
@@ -55,6 +55,7 @@ jobs:
       - name: Build docs
         run: |
           source .venv/bin/activate
+          pip install wheel setuptools
           cd .doc-builder
           ./make_docs_without_docker.sh -D html_theme_options.switcher.version_match=${{ inputs.version }} ..
 
