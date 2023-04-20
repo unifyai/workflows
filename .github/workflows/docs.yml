@@ -27,9 +27,8 @@ jobs:
       - name: Checkout 🛎️ Docs
         uses: actions/checkout@v3
         with:
-          repository: KareemMAX/docs
+          repository: unifyai/docs
           ssh-key: ${{ secrets.SSH_GH_PAGES }}
-        # TODO change this after testing
 
       - name: Setup Python
         uses: actions/setup-python@v4

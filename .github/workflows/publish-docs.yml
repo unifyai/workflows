@@ -67,6 +67,5 @@ jobs:
           branch: master
           git-config-name: ivy-seed
           git-config-email: ivydl.team@gmail.com
-          repository-name: KareemMAX/docs
+          repository-name: unifyai/docs
           clean: true
-          # TODO Change it after testing
