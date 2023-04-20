@@ -5,11 +5,20 @@ on:
         SSH_GH_PAGES:
           description: 'SSH key for GitHub Pages deployment'
           required: true
+      inputs:
+        package-dependencies:
+            description: 'Apt package dependencies'
+            required: false
+            default: ''
+            type: string
+
 jobs:
   publish-dev-docs:
     name: Publish dev docs
     uses: ./.github/workflows/publish-docs.yml
     secrets: inherit
+    with:
+      package-dependencies: ${{ inputs.package-dependencies }}
 
   publish-release-docs:
     name: Publish release docs
@@ -18,6 +27,7 @@ jobs:
     secrets: inherit
     with:
       version: ${{ github.ref_name }}
+      package-dependencies: ${{ inputs.package-dependencies }}
 
   update-versions:
     name: Update versions.json
