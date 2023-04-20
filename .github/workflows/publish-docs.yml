@@ -55,6 +55,7 @@ jobs:
       - name: Build docs
         run: |
           source .venv/bin/activate
+          pip install --upgrade pip
           pip install wheel setuptools
           cd .doc-builder
           ./make_docs_without_docker.sh -D html_theme_options.switcher.version_match=${{ inputs.version }} ..
