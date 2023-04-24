@@ -69,7 +69,8 @@ jobs:
           pip install --upgrade pip
           pip install wheel setuptools
           cd .doc-builder
-          ./make_docs_without_docker.sh -D html_theme_options.switcher.version_match=${{ inputs.version }} ..
+          export IVY_VERSION=${{ inputs.version }}
+          ./make_docs_without_docker.sh ..
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.4.1
