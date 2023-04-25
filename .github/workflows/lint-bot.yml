@@ -26,6 +26,7 @@ jobs:
           pre-commit run --all-files --show-diff-on-failure
 
       - name: Commit changes 📝
+        if: failure()
         run: |
           git config --local user.email "ivydl.team@gmail.com"
           git config --local user.name "ivy-branch"
