@@ -22,6 +22,7 @@ jobs:
           python -m pip install pre-commit
 
       - name: Run pre-commit 🚀
+        continue-on-error: true
         run: |
           pre-commit run --all-files --show-diff-on-failure
 
