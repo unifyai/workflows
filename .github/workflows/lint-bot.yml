@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.IVY_BRANCH_TOKEN }}
 
       - name: Setup Python 🐍
         uses: actions/setup-python@v4
@@ -36,7 +38,7 @@ jobs:
       - name: Commit changes 📝
         if: steps.check.outputs.changes == 'true'
         run: |
-          git config --local user.email "ivydl.team@gmail.com"
+          git config --local user.email "ivy.branch@lets-unify.ai"
           git config --local user.name "ivy-branch"
           git add .
           git commit -m "🤖 Lint code"
