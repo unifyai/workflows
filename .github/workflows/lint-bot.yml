@@ -1,6 +1,11 @@
 name: lint-bot
 
-on: workflow_call
+on: 
+  workflow_call:
+    secrets:
+      IVY_BRANCH_TOKEN:
+        required: true
+        description: "Token to access ivy-branch account"
 
 permissions:
   contents: write
