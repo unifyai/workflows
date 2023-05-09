@@ -40,11 +40,14 @@ jobs:
       head-ref: ${{ needs.trigger.outputs.head-ref }}
 
   acknowledge-format:
+    runs-on: ubuntu-latest
     needs: format-code
     name: Acknowledge lint bot
-    uses: peter-evans/create-or-update-comment@v3
-    with:
-      comment-id: ${{ github.event.comment.id }}
-      body: |
-        :white_check_mark: Ivy gardener has formatted your code.
-      reactions: '+1'
+    steps:
+      - name: Acknowledge lint bot
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: |
+            :white_check_mark: Ivy gardener has formatted your code.
+          reactions: '+1'
