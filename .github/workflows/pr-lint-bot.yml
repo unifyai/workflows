@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: '${{ secrets.IVY_BRANCH_TOKEN }}'
       
-      - uses: KareemMAX/pull-request-comment-branch@head-repo-owner
+      - uses: KareemMAX/pull-request-comment-branch@head-repo-owner-release
         id: comment-branch
 
   format-code:
