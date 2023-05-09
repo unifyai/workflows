@@ -6,6 +6,16 @@ on:
       IVY_BRANCH_TOKEN:
         required: true
         description: "Token to access ivy-branch account"
+    inputs:
+      head-ref:
+        required: false
+        description: "The branch to lint"
+        type: string
+      head-repo:
+        required: false
+        description: "The repository to lint"
+        type: string
+        default: ${{ github.repository }}
 
 permissions:
   contents: write
@@ -18,20 +28,17 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.IVY_BRANCH_TOKEN }}
+          repository: ${{ inputs.head-repo }}
+          ref: ${{ inputs.head-ref }}
 
       - name: Setup Python 🐍
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
 
-      - name: Install dependencies 📦
-        run: |
-          python -m pip install pre-commit
-
       - name: Run pre-commit 🚀
         continue-on-error: true
-        run: |
-          pre-commit run --all-files --show-diff-on-failure
+        uses: pre-commit/action@v3.0.0
 
       - name: Check if there are changes 📝
         id: check
