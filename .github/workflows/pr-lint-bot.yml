@@ -17,6 +17,7 @@ jobs:
     outputs:
       ivy-gardener: ${{ steps.ivy-gardener.outputs.triggered }}
       head-ref: ${{ steps.comment-branch.outputs.head_ref }}
+      head-repo: ${{ steps.comment-branch.outputs.head_repo }}
     steps:
       - uses: khan/pull-request-comment-trigger@v1.1.0
         id: ivy-gardener
@@ -27,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: '${{ secrets.IVY_BRANCH_TOKEN }}'
       
-      - uses: xt0rted/pull-request-comment-branch@v2
+      - uses: KareemMAX/pull-request-comment-branch@head-repo-owner
         id: comment-branch
 
   format-code:
@@ -38,6 +39,7 @@ jobs:
     secrets: inherit
     with:
       head-ref: ${{ needs.trigger.outputs.head-ref }}
+      head-repo: ${{ needs.trigger.outputs.head-repo }}
 
   acknowledge-format:
     runs-on: ubuntu-latest
