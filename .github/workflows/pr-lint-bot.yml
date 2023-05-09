@@ -54,3 +54,18 @@ jobs:
             :white_check_mark: Ivy gardener has formatted your code.
           reactions: '+1'
           token: ${{ secrets.IVY_BRANCH_TOKEN }}
+
+  format-code-failed:
+    runs-on: ubuntu-latest
+    needs: format-code
+    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    name: Acknowledge lint bot
+    steps:
+      - name: Acknowledge lint bot
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: |
+            :x: Ivy gardener failed to format your code.
+          reactions: '-1'
+          token: ${{ secrets.IVY_BRANCH_TOKEN }}
