@@ -16,6 +16,7 @@ jobs:
     if: ${{ github.event.issue.pull_request }}
     outputs:
       ivy-gardener: ${{ steps.ivy-gardener.outputs.triggered }}
+      head-ref: ${{ steps.comment-branch.outputs.head_ref }}
     steps:
       - uses: khan/pull-request-comment-trigger@v1.1.0
         id: ivy-gardener
@@ -25,6 +26,9 @@ jobs:
           reaction: rocket
         env:
           GITHUB_TOKEN: '${{ secrets.IVY_BRANCH_TOKEN }}'
+      
+      - uses: xt0rted/pull-request-comment-branch@v2
+        id: comment-branch
 
   format-code:
     needs: trigger
@@ -32,3 +36,15 @@ jobs:
     name: Trigger lint bot
     uses: ./.github/workflows/lint-bot.yml
     secrets: inherit
+    with:
+      head-ref: ${{ needs.trigger.outputs.head-ref }}
+
+  acknowledge-format:
+    needs: format-code
+    name: Acknowledge lint bot
+    uses: peter-evans/create-or-update-comment@v3
+    with:
+      comment-id: ${{ github.event.comment.id }}
+      body: |
+        :white_check_mark: Ivy gardener has formatted your code.
+      reactions: '+1'
