@@ -15,20 +15,20 @@ jobs:
     name: Check for triggers
     if: ${{ github.event.issue.pull_request }}
     outputs:
-      ivy-lint: ${{ steps.ivy-lint.outputs.triggered }}
+      ivy-gardener: ${{ steps.ivy-gardener.outputs.triggered }}
     steps:
       - uses: khan/pull-request-comment-trigger@v1.1.0
-        id: ivy-lint
+        id: ivy-gardener
         name: Check for ivy-lint
         with:
-          trigger: 'ivy-lint'
+          trigger: 'ivy-gardener'
           reaction: rocket
         env:
           GITHUB_TOKEN: '${{ secrets.IVY_BRANCH_TOKEN }}'
 
   format-code:
     needs: trigger
-    if: ${{ needs.trigger.outputs.ivy-lint == 'true' }}
+    if: ${{ needs.trigger.outputs.ivy-gardener == 'true' }}
     name: Trigger lint bot
     uses: ./.github/workflows/lint-bot.yml
     secrets: inherit
