@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Check for triggers
     if: ${{ github.event.issue.pull_request }}
+    outputs:
+      ivy-lint: ${{ steps.ivy-lint.outputs.triggered }}
     steps:
       - uses: khan/pull-request-comment-trigger@v1.1.0
         id: ivy-lint
@@ -23,10 +25,6 @@ jobs:
           reaction: rocket
         env:
           GITHUB_TOKEN: '${{ secrets.IVY_BRANCH_TOKEN }}'
-        
-      - name: Output result
-        run: |
-          echo "ivy-lint=${{ steps.check.ivy-lint.triggered }}" >> $GITHUB_OUTPUT
 
   format-code:
     needs: trigger
