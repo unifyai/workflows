@@ -51,3 +51,4 @@ jobs:
           body: |
             :white_check_mark: Ivy gardener has formatted your code.
           reactions: '+1'
+          token: ${{ secrets.IVY_BRANCH_TOKEN }}
