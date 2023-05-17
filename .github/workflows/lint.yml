@@ -12,7 +12,9 @@ jobs:
       - name: Get changed files
         if: github.event_name == 'pull_request'
         id: changed-files
-        uses: tj-actions/changed-files@v35
+        uses: lots0logs/gh-action-get-changed-files@2.1.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python 🐍
         uses: actions/setup-python@v4
@@ -22,4 +24,4 @@ jobs:
       - name: Run pre-commit 🚀
         uses: pre-commit/action@v3.0.0
         with:
-          extra_args: ${{ github.event_name == 'pull_request' && format('--files {0}', join(steps.changed-files.outputs.all_changed_files, ' ')) || '--all-files' }}
+          extra_args: ${{ github.event_name == 'pull_request' && format('--files {0}', join(fromJSON(steps.changed-files.outputs.all), ' ')) || '--all-files' }}
