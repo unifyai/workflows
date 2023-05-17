@@ -9,6 +9,11 @@ jobs:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
         uses: actions/checkout@v3
 
+      - name: Get changed files
+        if: github.event_name == 'pull_request'
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+
       - name: Setup Python 🐍
         uses: actions/setup-python@v4
         with:
@@ -16,3 +21,5 @@ jobs:
 
       - name: Run pre-commit 🚀
         uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: ${{ github.event_name == 'pull_request' && format('--files {0}', join(steps.changed-files.outputs.all_changed_files, ' ')) || '--all-files' }}
