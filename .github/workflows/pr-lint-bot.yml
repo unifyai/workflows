@@ -24,12 +24,18 @@ jobs:
         name: Check for ivy-lint
         with:
           trigger: 'ivy-gardener'
-          reaction: rocket
-        env:
-          GITHUB_TOKEN: '${{ secrets.IVY_BRANCH_TOKEN }}'
+
+      - name: Mark comment as read
+        uses: peter-evans/create-or-update-comment@v3
+        if: ${{ steps.ivy-gardener.outputs.triggered && steps.ivy-gardener.outputs.comment_body == 'ivy-gardener'}}
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          reactions: 'rocket'
+          token: ${{ secrets.IVY_BRANCH_TOKEN }}
       
       - uses: KareemMAX/pull-request-comment-branch@head-repo-owner-release
         id: comment-branch
+        if: ${{ steps.ivy-gardener.outputs.triggered && steps.ivy-gardener.outputs.comment_body == 'ivy-gardener'}}
 
   format-code:
     needs: trigger
