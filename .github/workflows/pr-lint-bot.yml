@@ -15,7 +15,7 @@ jobs:
     name: Check for triggers
     if: ${{ github.event.issue.pull_request }}
     outputs:
-      ivy-gardener: ${{ steps.ivy-gardener.outputs.triggered }}
+      ivy-gardener: ${{ steps.ivy-gardener.outputs.triggered && steps.ivy-gardener.outputs.comment_body == 'ivy-gardener' }}
       head-ref: ${{ steps.comment-branch.outputs.head_ref }}
       head-repo: ${{ steps.comment-branch.outputs.head_owner }}/${{ steps.comment-branch.outputs.head_repo }}
     steps:
