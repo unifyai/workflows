@@ -23,7 +23,7 @@ jobs:
   publish-release-docs:
     name: Publish release docs
     uses: ./.github/workflows/publish-docs.yml
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    if: startsWith(github.ref, 'refs/tags')
     secrets: inherit
     with:
       version: ${{ github.ref_name }}
