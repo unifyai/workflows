@@ -31,7 +31,7 @@ jobs:
       - name: Checkout 🛎️ ${{ inputs.repo_name }}
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.repo_name }}
+          repository: unifyai/${{ inputs.repo_name }}
           fetch-depth: 1
 
       - name: Checkout 🛎️ Doc-builder
