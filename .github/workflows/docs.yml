@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Wait for other workflows
         uses: softprops/turnstyle@v1
+        with:
+          poll-interval-seconds: 1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
