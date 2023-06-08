@@ -17,6 +17,8 @@ jobs:
     name: Wait For Other Workflows To Complete
     runs-on: ubuntu-latest
     steps:
+      - name: Delay for concurrent run detection
+        run: sleep 10
       - name: Wait for other workflows
         uses: softprops/turnstyle@v1
         with:
