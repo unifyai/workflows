@@ -18,12 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait for other workflows
-        uses: softprops/turnstyle@v1
+        uses: mktcode/consecutive-workflow-action@eb43c6b5852dd0e33efa797a1817196d06daa4b2
         with:
-          poll-interval-seconds: 1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+          token: ${{ secrets.GITHUB_TOKEN }}
+
   publish-dev-docs:
     name: Publish dev docs
     needs: wait-for-others
