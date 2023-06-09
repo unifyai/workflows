@@ -37,7 +37,7 @@ jobs:
           ref: ${{ inputs.head-ref }}
 
       - name: Get changed files
-        if: github.event_name == 'pull_request' && inputs.only-changed-files
+        if: inputs.only-changed-files
         id: changed-files
         uses: lots0logs/gh-action-get-changed-files@2.1.4
         with:
