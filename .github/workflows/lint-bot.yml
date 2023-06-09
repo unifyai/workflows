@@ -16,6 +16,11 @@ on:
         description: "The repository to lint"
         type: string
         default: ${{ github.repository }}
+      only-changed-files:
+        required: false
+        description: "Only lint changed files"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -31,6 +36,13 @@ jobs:
           repository: ${{ inputs.head-repo }}
           ref: ${{ inputs.head-ref }}
 
+      - name: Get changed files
+        if: github.event_name == 'pull_request' && inputs.only-changed-files
+        id: changed-files
+        uses: lots0logs/gh-action-get-changed-files@2.1.4
+        with:
+          token: ${{ secrets.IVY_BRANCH_TOKEN }}
+
       - name: Setup Python 🐍
         uses: actions/setup-python@v4
         with:
@@ -39,6 +51,8 @@ jobs:
       - name: Run pre-commit 🚀
         continue-on-error: true
         uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: ${{ inputs.only-changed-files && format('--files {0}', join(fromJSON(steps.changed-files.outputs.all), ' ')) || '--all-files' }}
 
       - name: Check if there are changes 📝
         id: check
