@@ -46,7 +46,7 @@ jobs:
     with:
       head-ref: ${{ needs.trigger.outputs.head-ref }}
       head-repo: ${{ needs.trigger.outputs.head-repo }}
-      # only-changed-files: true
+      only-changed-files: true
 
   acknowledge-format:
     runs-on: ubuntu-latest

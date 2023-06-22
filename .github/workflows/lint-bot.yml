@@ -39,7 +39,7 @@ jobs:
       - name: Get changed files
         if: inputs.only-changed-files
         id: changed-files
-        uses: lots0logs/gh-action-get-changed-files@2.1.4
+        uses: KareemMAX/gh-action-get-changed-files@5a5ee034eff88bee239d4f49cd041fed0bec7480
         with:
           token: ${{ secrets.IVY_BRANCH_TOKEN }}
 
