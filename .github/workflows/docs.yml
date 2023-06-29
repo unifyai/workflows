@@ -17,8 +17,8 @@ jobs:
     name: Publish dev docs
     uses: ./.github/workflows/publish-docs.yml
     concurrency:
-        group: ${{ github.workflow }}-dev
-        cancel-in-progress: true
+        group: ${{ github.workflow }}
+        cancel-in-progress: false
     secrets: inherit
     with:
       package-dependencies: ${{ inputs.package-dependencies }}
@@ -28,8 +28,8 @@ jobs:
     uses: ./.github/workflows/publish-docs.yml
     if: startsWith(github.ref, 'refs/tags')
     concurrency:
-        group: ${{ github.workflow }}-release
-        cancel-in-progress: true
+        group: ${{ github.workflow }}
+        cancel-in-progress: false
     secrets: inherit
     with:
       version: ${{ github.ref_name }}
