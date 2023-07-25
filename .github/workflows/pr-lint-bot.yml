@@ -79,3 +79,25 @@ jobs:
           reactions: '-1'
           reactions-edit-mode: replace
           token: ${{ secrets.IVY_BRANCH_TOKEN }}
+
+  Run Python Script:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Install apt dependencies
+      if: inputs.package-dependencies != ''
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ${{ inputs.package-dependencies }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+
+    - name: Run naming convention enforcement script
+      run: python enforce_naming_convention.py
+      env:
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
