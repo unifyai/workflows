@@ -25,8 +25,12 @@ on:
 permissions:
   contents: write
 
+env:
+  COMMIT_MESSAGE: "🤖 Lint code"
+
 jobs:
   format-code:
+    if: '!contains(github.event.head_commit.message, env.COMMIT_MESSAGE)'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
@@ -58,14 +62,14 @@ jobs:
         id: check
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
-            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "changes=true" >> $GITHUB_ENV
           fi
 
       - name: Commit changes 📝
-        if: steps.check.outputs.changes == 'true'
+        if: env.changes == 'true'
         run: |
           git config --local user.email "ivy.branch@lets-unify.ai"
           git config --local user.name "ivy-branch"
           git add .
-          git commit -m "🤖 Lint code"
+          git commit -m "${{ env.COMMIT_MESSAGE }}"
           git push
