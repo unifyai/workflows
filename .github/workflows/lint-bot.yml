@@ -21,16 +21,18 @@ on:
         description: "Only lint changed files"
         type: boolean
         default: false
+      commit-message:
+        required: true
+        description: "Commit message "
+        type: string
+        default: "🤖 Lint code"
+      
 
 permissions:
   contents: write
 
-env:
-  COMMIT_MESSAGE: "🤖 Lint code"
-
 jobs:
   format-code:
-    if: '!contains(github.event.head_commit.message, env.COMMIT_MESSAGE)'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
@@ -66,10 +68,10 @@ jobs:
           fi
 
       - name: Commit changes 📝
-        if: env.changes == 'true'
+        if: steps.check.outputs.changes == 'true'
         run: |
           git config --local user.email "ivy.branch@lets-unify.ai"
           git config --local user.name "ivy-branch"
           git add .
-          git commit -m "${{ env.COMMIT_MESSAGE }}"
+          git commit -m "${{ inputs.commit-message }}"
           git push
