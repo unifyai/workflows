@@ -3,35 +3,34 @@ name: Trigger lint format
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
-
-env:
-  COMMIT_MESSAGE: "🤖 Lint code"
+  workflow_call:
+    inputs:
+      COMMIT_MESSAGE:
+        description: 'Commit message to prevent re-triggering the workflow'
+        required: true
+        type: string
+        default: '🤖 Lint code'
 
 permissions:
   contents: write
 
 jobs:
-  trigger:
-    if: '!contains(github.event.head_commit.message, env.COMMIT_MESSAGE)'
+  format-code:
+    if: '!contains(github.event.head_commit.message, inputs.COMMIT_MESSAGE)'
     runs-on: ubuntu-latest
-    name: Check for triggers
+    name: Trigger lint bot
     outputs:
       head-ref: ${{ github.event.pull_request.head.ref }}
       head-repo: ${{ github.event.pull_request.head.repo.full_name }}
     steps:
-      - name: Set up triggers
+      - name: Set up linting process
         run: echo "Triggering linting process."
-
-  format-code:
-    if: '!contains(github.event.head_commit.message, env.COMMIT_MESSAGE)'
-    needs: trigger
-    name: Trigger lint bot
-    uses: ./.github/workflows/lint-bot.yml
-    secrets: inherit
-    with:
-      head-ref: ${{ needs.trigger.outputs.head-ref }}
-      head-repo: ${{ needs.trigger.outputs.head-repo }}
-      only-changed-files: true
+      - uses: ./.github/workflows/lint-bot.yml
+        secrets: inherit
+        with:
+          head-ref: ${{ github.event.pull_request.head.ref }}
+          head-repo: ${{ github.event.pull_request.head.repo.full_name }}
+          only-changed-files: true
 
   acknowledge-format:
     runs-on: ubuntu-latest
@@ -41,26 +40,28 @@ jobs:
       - name: Acknowledge lint bot
         uses: peter-evans/create-or-update-comment@v3
         with:
-          comment-id: ${{ github.event.comment.id }}
+          issue-number: ${{ github.event.pull_request.number }}
           body: |
             :white_check_mark: Ivy gardener has formatted your code.
             If changes are requested, don't forget to pull your fork.
           reactions: '+1'
           reactions-edit-mode: replace
           token: ${{ secrets.IVY_BRANCH_TOKEN }}
-
+        
   format-code-failed:
     runs-on: ubuntu-latest
     needs: format-code
     if: ${{ always() && contains(needs.*.result, 'failure') }}
-    name: Acknowledge lint bot
+    name: Acknowledge lint bot failure
     steps:
       - name: Acknowledge lint bot
         uses: peter-evans/create-or-update-comment@v3
         with:
-          comment-id: ${{ github.event.comment.id }}
+          issue-number: ${{ github.event.pull_request.number }}
           body: |
             :x: Ivy gardener failed to format your code.
           reactions: '-1'
           reactions-edit-mode: replace
           token: ${{ secrets.IVY_BRANCH_TOKEN }}
+        
+
