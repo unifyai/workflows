@@ -22,7 +22,7 @@ on:
         type: boolean
         default: false
       commit-message:
-        required: true
+        required: false
         description: "Commit message "
         type: string
         default: "🤖 Lint code"
