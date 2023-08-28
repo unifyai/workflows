@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
   workflow_call:
+    secrets:
+      IVY_BRANCH_TOKEN:
+        required: true
+        description: "Token to access ivy-branch account"
     inputs:
       COMMIT_MESSAGE:
         description: 'Commit message to prevent re-triggering the workflow'
