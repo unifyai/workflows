@@ -9,7 +9,7 @@ on:
     inputs:
       COMMIT_MESSAGE:
         description: "Commit message to prevent re-triggering the workflow"
-        required: true
+        required: false
         type: string
         default: "🤖 Lint code"
 
@@ -26,20 +26,3 @@ jobs:
       head-ref: ${{ github.event.pull_request.head.ref }}
       head-repo: ${{ github.event.pull_request.head.repo.full_name }}
       only-changed-files: true
-
-
-  format-code-failed:
-    runs-on: ubuntu-latest
-    needs: format-code
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
-    name: Acknowledge lint bot failure
-    steps:
-      - name: Acknowledge lint bot
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            :x: Ivy gardener failed to format your code.
-          reactions: '-1'
-          reactions-edit-mode: replace
-          token: ${{ secrets.IVY_BRANCH_TOKEN }}
