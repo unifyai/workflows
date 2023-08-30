@@ -1,8 +1,6 @@
 name: Trigger lint format
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, edited]
   workflow_call:
     secrets:
       IVY_BRANCH_TOKEN:
@@ -10,17 +8,17 @@ on:
         description: "Token to access ivy-branch account"
     inputs:
       COMMIT_MESSAGE:
-        description: 'Commit message to prevent re-triggering the workflow'
+        description: "Commit message to prevent re-triggering the workflow"
         required: true
         type: string
-        default: '🤖 Lint code'
+        default: "🤖 Lint code"
 
 permissions:
   contents: write
 
 jobs:
   format-code:
-    if: '!contains(github.event.head_commit.message, github.event.inputs.COMMIT_MESSAGE)'
+    if: "!contains(github.event.head_commit.message, github.event.inputs.COMMIT_MESSAGE)"
     name: Trigger lint bot
     uses: ./.github/workflows/lint-bot.yml
     secrets: inherit
