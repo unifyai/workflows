@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   format-code:
-    if: ${{ !contains(github.event.head_commit.message, github.event.inputs.COMMIT_MESSAGE) }}
+    # if: ${{ !contains(github.event.head_commit.message, github.event.inputs.COMMIT_MESSAGE) }}
     name: Trigger lint bot
     uses: ./.github/workflows/lint-bot.yml
     secrets: inherit
