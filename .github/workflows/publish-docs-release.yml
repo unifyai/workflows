@@ -33,6 +33,7 @@ jobs:
         with:
           repository: unifyai/${{ inputs.repo_name }}
           fetch-depth: 1
+          submodules: recursive
 
       - name: Checkout 🛎️ Doc-builder
         uses: actions/checkout@v3
