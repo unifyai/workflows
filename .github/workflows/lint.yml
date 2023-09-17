@@ -1,20 +1,32 @@
 name: lint
 
-on: workflow_call
+on: 
+  workflow_call:
+    secrets:
+      IVY_BRANCH_TOKEN:
+        required: true
+        description: "Token to access ivy-branch account"
+
+permissions:
+  contents: write
 
 jobs:
   check-formatting:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          token: ${{ secrets.IVY_BRANCH_TOKEN }}
 
-      - name: Get changed files
+      - name: Get changed files 🧐
         if: github.event_name == 'pull_request'
         id: changed-files
         uses: lots0logs/gh-action-get-changed-files@2.1.4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.IVY_BRANCH_TOKEN }}
 
       - name: Setup Python 🐍
         uses: actions/setup-python@v4
@@ -22,6 +34,14 @@ jobs:
           python-version: 3.8
 
       - name: Run pre-commit 🚀
+        continue-on-error: true
         uses: pre-commit/action@v3.0.0
         with:
           extra_args: ${{ github.event_name == 'pull_request' && format('--files {0}', join(fromJSON(steps.changed-files.outputs.all), ' ')) || '--all-files' }}
+
+      - name: Commit changes 📝
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: ivy-branch
+          author_email: ivy.branch@lets-unify.ai
+          message: '🤖 Lint code'

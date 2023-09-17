@@ -1,81 +1,76 @@
 name: Trigger lint format
+
 on:
   workflow_call:
     secrets:
       IVY_BRANCH_TOKEN:
         required: true
         description: "Token to access ivy-branch account"
+    inputs:
+      only-changed-files:
+        required: false
+        description: "Only lint changed files"
+        type: boolean
+        default: true
+      head-ref:
+        required: false
+        description: "The branch to lint"
+        type: string
+      head-repo:
+        required: false
+        description: "The repository to lint"
+        type: string
+        default: ${{ github.repository }}
+      commit-message:
+        description: "Commit message to prevent re-triggering the workflow"
+        required: false
+        type: string
+        default: "🤖 Lint code"
 
 permissions:
   contents: write
 
 jobs:
-  trigger:
-    runs-on: ubuntu-latest
-    name: Check for triggers
-    if: ${{ github.event.issue.pull_request }}
-    outputs:
-      ivy-gardener: ${{ steps.ivy-gardener.outputs.triggered && steps.ivy-gardener.outputs.comment_body == 'ivy-gardener' }}
-      head-ref: ${{ steps.comment-branch.outputs.head_ref }}
-      head-repo: ${{ steps.comment-branch.outputs.head_owner }}/${{ steps.comment-branch.outputs.head_repo }}
-    steps:
-      - uses: khan/pull-request-comment-trigger@v1.1.0
-        id: ivy-gardener
-        name: Check for ivy-lint
-        with:
-          trigger: 'ivy-gardener'
-
-      - name: Mark comment as read
-        uses: peter-evans/create-or-update-comment@v3
-        if: ${{ steps.ivy-gardener.outputs.triggered && steps.ivy-gardener.outputs.comment_body == 'ivy-gardener'}}
-        with:
-          comment-id: ${{ github.event.comment.id }}
-          reactions: 'rocket'
-          token: ${{ secrets.IVY_BRANCH_TOKEN }}
-      
-      - uses: KareemMAX/pull-request-comment-branch@head-repo-owner-release
-        id: comment-branch
-        if: ${{ steps.ivy-gardener.outputs.triggered && steps.ivy-gardener.outputs.comment_body == 'ivy-gardener'}}
-
   format-code:
-    needs: trigger
-    if: ${{ needs.trigger.outputs.ivy-gardener == 'true' }}
-    name: Trigger lint bot
-    uses: ./.github/workflows/lint-bot.yml
-    secrets: inherit
-    with:
-      head-ref: ${{ needs.trigger.outputs.head-ref }}
-      head-repo: ${{ needs.trigger.outputs.head-repo }}
-      only-changed-files: true
-
-  acknowledge-format:
     runs-on: ubuntu-latest
-    needs: format-code
-    name: Acknowledge lint bot
     steps:
-      - name: Acknowledge lint bot
-        uses: peter-evans/create-or-update-comment@v3
+      - name: Checkout 🛎️ ${{ github.event.repository.name }}
+        uses: actions/checkout@v4
         with:
-          comment-id: ${{ github.event.comment.id }}
-          body: |
-            :white_check_mark: Ivy gardener has formatted your code.
-            If changes are requested, don't forget to pull your fork.
-          reactions: '+1'
-          reactions-edit-mode: replace
+          token: ${{ secrets.IVY_BRANCH_TOKEN }}
+          repository: ${{ inputs.head-repo }}
+          ref: ${{ inputs.head-ref }}
+
+      - name: Get changed files
+        if: inputs.only-changed-files
+        id: changed-files
+        uses: KareemMAX/gh-action-get-changed-files@5a5ee034eff88bee239d4f49cd041fed0bec7480
+        with:
           token: ${{ secrets.IVY_BRANCH_TOKEN }}
 
-  format-code-failed:
-    runs-on: ubuntu-latest
-    needs: format-code
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
-    name: Acknowledge lint bot
-    steps:
-      - name: Acknowledge lint bot
-        uses: peter-evans/create-or-update-comment@v3
+      - name: Setup Python 🐍
+        uses: actions/setup-python@v4
         with:
-          comment-id: ${{ github.event.comment.id }}
-          body: |
-            :x: Ivy gardener failed to format your code.
-          reactions: '-1'
-          reactions-edit-mode: replace
-          token: ${{ secrets.IVY_BRANCH_TOKEN }}
+          python-version: 3.8
+
+      - name: Run pre-commit 🚀
+        continue-on-error: true
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: ${{ inputs.only-changed-files && format('--files {0}', join(fromJSON(steps.changed-files.outputs.all), ' ')) || '--all-files' }}
+
+      - name: Check if there are changes 📝
+        id: check
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes 📝
+        if: steps.check.outputs.changes == 'true'
+        run: |
+          git config --local user.email "ivy.branch@lets-unify.ai"
+          git config --local user.name "ivy-branch"
+          git add .
+          git commit -m "${{ inputs.commit-message }}"
+          git push
