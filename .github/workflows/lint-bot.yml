@@ -21,6 +21,12 @@ on:
         description: "Only lint changed files"
         type: boolean
         default: false
+      commit-message:
+        required: false
+        description: "Commit message "
+        type: string
+        default: "🤖 Lint code"
+      
 
 permissions:
   contents: write
@@ -67,5 +73,5 @@ jobs:
           git config --local user.email "ivy.branch@lets-unify.ai"
           git config --local user.name "ivy-branch"
           git add .
-          git commit -m "🤖 Lint code"
+          git commit -m "${{ inputs.commit-message }}"
           git push
