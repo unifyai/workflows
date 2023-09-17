@@ -33,6 +33,7 @@ permissions:
 
 jobs:
   format-code:
+    if: ${{ github.event.inputs.commit-message != inputs.commit-message }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
