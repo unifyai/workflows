@@ -21,12 +21,6 @@ on:
         description: "Only lint changed files"
         type: boolean
         default: false
-      commit-message:
-        required: false
-        description: "Commit message "
-        type: string
-        default: "🤖 Lint code"
-      
 
 permissions:
   contents: write
@@ -36,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.IVY_BRANCH_TOKEN }}
           repository: ${{ inputs.head-repo }}
@@ -73,5 +67,5 @@ jobs:
           git config --local user.email "ivy.branch@lets-unify.ai"
           git config --local user.name "ivy-branch"
           git add .
-          git commit -m "${{ inputs.commit-message }}"
+          git commit -m "🤖 Lint code"
           git push
