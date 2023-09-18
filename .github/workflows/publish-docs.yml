@@ -23,13 +23,13 @@ jobs:
     name: Publish ${{ inputs.version }} docs
     steps:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
 
       - name: Checkout 🛎️ Doc-builder
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: unifyai/doc-builder
           path: .doc-builder
