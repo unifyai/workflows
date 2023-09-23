@@ -30,7 +30,6 @@ jobs:
 
   format-code:
     needs: trigger
-    if: ${{ inputs.COMMIT_MESSAGE != github.event.head_commit.message }}
     name: Trigger lint bot
     uses: ./.github/workflows/lint-bot.yml
     secrets: inherit
