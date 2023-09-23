@@ -18,11 +18,7 @@ permissions:
 
 jobs:
   format-code:
-    if: ${{ github.event.inputs.COMMIT_MESSAGE != '🤖 Lint code' }}
-    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, github.event.inputs.COMMIT_MESSAGE) }}
     name: Trigger lint bot
-    steps:
-      - name: Execute lint bot
-        uses: ./.github/workflows/lint-bot.yml
-        with:
-          GITHUB_TOKEN: ${{ secrets.IVY_BRANCH_TOKEN }}
+    uses: unifyai/workflows/.github/workflows/lint-bot.yml@automatic-lint-pr
+    secrets: inherit
