@@ -18,7 +18,6 @@ permissions:
 
 jobs:
   format-code:
-    if: ${{ github.event.head_commit.message != github.event.inputs.COMMIT_MESSAGE }}
     name: Trigger lint bot
     uses: unifyai/workflows/.github/workflows/lint-bot.yml@automatic-lint-pr
     secrets: inherit
