@@ -18,7 +18,6 @@ permissions:
 
 jobs:
   format-code:
-    if: ${{ github.event.inputs.COMMIT_MESSAGE != '🤖 Lint code'}}
     name: Trigger lint bot
     uses: ./.github/workflows/lint-bot.yml
     secrets: inherit
