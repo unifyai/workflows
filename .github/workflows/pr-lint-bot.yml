@@ -30,7 +30,7 @@ jobs:
   format-code:
     needs: trigger
     name: Trigger lint bot
-    uses: unifyai/workflows/.github/workflows/lint-bot.yml@automatic-lint-pr
+    uses: ./.github/workflows/lint-bot.yml
     secrets: inherit
     with:
       head-ref: ${{ needs.trigger.outputs.head-ref }}
