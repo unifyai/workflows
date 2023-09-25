@@ -31,6 +31,10 @@ jobs:
   format-code:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug
+        run: | 
+          echo "head-ref: ${{ inputs.head-ref }} head-repo: ${{ inputs.head-repo }} only-changed-files: ${{ inputs.only-changed-files }} commit-message: ${{ inputs.commit-message }} secrets.IVY_BRANCH_TOKEN: ${{ secrets.IVY_BRANCH_TOKEN }}"
+
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
         uses: actions/checkout@v4
         with:
