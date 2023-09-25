@@ -2,6 +2,10 @@ name: Trigger lint format
 
 on:
   workflow_call:
+    secrets:
+      IVY_BRANCH_TOKEN:
+        required: false
+        description: "Token to access ivy-branch account"
     inputs:
       COMMIT_MESSAGE:
         description: "Commit message to prevent re-triggering the workflow"
