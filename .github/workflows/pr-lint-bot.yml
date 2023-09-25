@@ -31,7 +31,6 @@ jobs:
     needs: trigger
     name: Trigger lint bot
     uses: ./.github/workflows/lint-bot.yml
-    secrets: inherit
     with:
       head-ref: ${{ needs.trigger.outputs.head-ref }}
       head-repo: ${{ needs.trigger.outputs.head-repo }}
