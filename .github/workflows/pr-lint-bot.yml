@@ -27,8 +27,7 @@ jobs:
     needs: trigger
     name: Trigger lint bot
     uses: ./.github/workflows/lint-bot.yml
-    secrets: 
-      IVY_BRANCH_TOKEN: ${{ secrets.IVY_BRANCH_TOKEN }}
+    secrets: inherit
     with:
       head-ref: ${{ needs.trigger.outputs.head-ref }}
       head-repo: ${{ needs.trigger.outputs.head-repo }}
