@@ -26,7 +26,6 @@ on:
         description: "Commit message "
         type: string
         default: "🤖 Lint code"
-      
 
 permissions:
   contents: write

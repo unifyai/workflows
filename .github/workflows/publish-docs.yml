@@ -23,12 +23,13 @@ jobs:
     name: Publish ${{ inputs.version }} docs
     steps:
       - name: Checkout 🛎️ ${{ github.event.repository.name }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Checkout 🛎️ Doc-builder
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: unifyai/doc-builder
           path: .doc-builder
@@ -41,8 +42,9 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v4
+        id: setup-python
         with:
-          python-version: 3.8
+          python-version: '3.10'
 
       - name: Get cache week key
         id: get-cache-week-key
@@ -54,9 +56,9 @@ jobs:
         id: cache
         with:
           path: ./.venv
-          key: ${{ runner.os }}-pip-${{ steps.get-cache-week-key.outputs.week-key }}
+          key: ${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-pip-${{ steps.get-cache-week-key.outputs.week-key }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-pip-
 
       - name: Create virtual environment
         if: steps.cache.outputs.cache-hit != 'true'
