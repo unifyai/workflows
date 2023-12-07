@@ -16,6 +16,11 @@ on:
           required: false
           default: ${{ github.event.repository.name }}
           type: string
+        docs-repo:
+          description: 'Repo to hold the docs'
+          required: false
+          default: unifyai/docs
+          type: string
 
 jobs:
   publish-dev-docs:
@@ -28,6 +33,7 @@ jobs:
     with:
       package-dependencies: ${{ inputs.package-dependencies }}
       repo-name: ${{ inputs.repo-name }}
+      docs-repo: ${{ inputs.docs-repo }}
 
   publish-release-docs:
     name: Publish release docs
@@ -39,6 +45,7 @@ jobs:
       version: ${{ github.ref_name }}
       package-dependencies: ${{ inputs.package-dependencies }}
       repo-name: ${{ inputs.repo-name }}
+      docs-repo: ${{ inputs.docs-repo }}
 
   update-versions:
     name: Update versions.json
@@ -48,7 +55,7 @@ jobs:
       - name: Checkout 🛎️ Docs
         uses: actions/checkout@v4
         with:
-          repository: unifyai/docs
+          repository: ${{ inputs.docs-repo }}
           ssh-key: ${{ secrets.SSH_GH_PAGES }}
 
       - name: Setup Python

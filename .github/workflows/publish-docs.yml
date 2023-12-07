@@ -21,6 +21,11 @@ on:
           required: false
           default: ${{ github.event.repository.name }}
           type: string
+        docs-repo:
+          description: 'Repo to hold the docs'
+          required: false
+          default: unifyai/docs
+          type: string
 
 jobs:
   publish-docs:
@@ -88,5 +93,5 @@ jobs:
           branch: main
           git-config-name: ivy-seed
           git-config-email: ivydl.team@gmail.com
-          repository-name: unifyai/docs
+          repository-name: ${{ inputs.docs-repo }}
           clean: true
