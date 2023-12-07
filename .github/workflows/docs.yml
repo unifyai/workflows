@@ -13,20 +13,13 @@ on:
             type: string
 
 jobs:
-  wait-for-others:
-    name: Wait For Other Workflows To Complete
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for other workflows
-        uses: mktcode/consecutive-workflow-action@eb43c6b5852dd0e33efa797a1817196d06daa4b2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   publish-dev-docs:
     name: Publish dev docs
-    needs: wait-for-others
     uses: ./.github/workflows/publish-docs.yml
     secrets: inherit
+    concurrency:
+      group: dev-docs
+      cancel-in-progress: true
     with:
       package-dependencies: ${{ inputs.package-dependencies }}
 
@@ -34,7 +27,7 @@ jobs:
     name: Publish release docs
     needs: publish-dev-docs
     uses: ./.github/workflows/publish-docs.yml
-    if: startsWith(github.ref, 'refs/tags')
+    if: always() && startsWith(github.ref, 'refs/tags')
     secrets: inherit
     with:
       version: ${{ github.ref_name }}
