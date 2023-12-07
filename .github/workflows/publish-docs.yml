@@ -16,13 +16,18 @@ on:
           required: false
           default: ''
           type: string
+        repo-name:
+          description: 'Repo display name in the URL'
+          required: false
+          default: ${{ github.event.repository.name }}
+          type: string
 
 jobs:
   publish-docs:
     runs-on: ubuntu-latest
     name: Publish ${{ inputs.version }} docs
     steps:
-      - name: Checkout 🛎️ ${{ github.event.repository.name }}
+      - name: Checkout 🛎️ ${{ inputs.repo-name }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -78,7 +83,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           folder: docs/build
-          target-folder: "${{ inputs.version != 'dev' && format('{0}/', inputs.version) || '' }}${{ github.event.repository.name }}"
+          target-folder: "${{ inputs.version != 'dev' && format('{0}/', inputs.version) || '' }}${{ inputs.repo-name }}"
           ssh-key: ${{ secrets.SSH_GH_PAGES }}
           branch: main
           git-config-name: ivy-seed

@@ -11,6 +11,11 @@ on:
             required: false
             default: ''
             type: string
+        repo-name:
+          description: 'Repo display name in the URL'
+          required: false
+          default: ${{ github.event.repository.name }}
+          type: string
 
 jobs:
   publish-dev-docs:
@@ -22,6 +27,7 @@ jobs:
       cancel-in-progress: true
     with:
       package-dependencies: ${{ inputs.package-dependencies }}
+      repo-name: ${{ inputs.repo-name }}
 
   publish-release-docs:
     name: Publish release docs
@@ -32,6 +38,7 @@ jobs:
     with:
       version: ${{ github.ref_name }}
       package-dependencies: ${{ inputs.package-dependencies }}
+      repo-name: ${{ inputs.repo-name }}
 
   update-versions:
     name: Update versions.json
@@ -49,14 +56,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Add version to ${{ github.event.repository.name }}.json
+      - name: Add version to ${{ inputs.repo-name }}.json
         run: |
-          python versions/add_version.py ${{ github.event.repository.name }} ${{ github.ref_name }}
+          python versions/add_version.py ${{ inputs.repo-name }} ${{ github.ref_name }}
 
       - name: Commit and push
         run: |
           git config --global user.email "ivydl.team@gmail.com"
           git config --global user.name "ivy-seed"
           git add versions/
-          git commit -m "Add ${{ github.ref_name }} to ${{ github.event.repository.name }}.json"
+          git commit -m "Add ${{ github.ref_name }} to ${{ inputs.repo-name }}.json"
           git push
