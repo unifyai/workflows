@@ -85,7 +85,7 @@ jobs:
           ./make_docs_without_docker.sh ..
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4.6.1
         with:
           folder: docs/build
           target-folder: "${{ inputs.version != 'dev' && format('{0}/', inputs.version) || '' }}${{ inputs.repo-name }}"
