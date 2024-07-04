@@ -42,12 +42,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: unifyai/unify
-          path: ../unify
+          path: unify-container
 
       - name: Copy Unify to the repo
         run: |
-          cp -r ../unify/unify .
-          cp -r ../unify/pyproject.toml .
+          mv unify-container/unify .
+          mv unify-container/pyproject.toml .
+          rm -rf unify-container
           ls
            
       - name: Checkout 🛎️ Doc-builder
