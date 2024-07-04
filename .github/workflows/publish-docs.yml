@@ -46,6 +46,7 @@ jobs:
 
       - name: Copy Unify to the repo
         run: |
+          pwd  
           ls
           cp -r unify/unify ${{ inputs.repo-name }}
           cp -r unify/pyproject.toml ${{ inputs.repo-name }}
