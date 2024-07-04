@@ -38,6 +38,16 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Checkout 🛎️ Unify
+        uses: actions/checkout@v4
+        with:
+          repository: unifyai/unify
+
+      - name: Copy Unify to the repo
+        run: |
+           cp -r unify/unify ${{ inputs.repo-name }}
+           cp -r unify/pyproject.toml ${{ inputs.repo-name }}
+           
       - name: Checkout 🛎️ Doc-builder
         uses: actions/checkout@v4
         with:
