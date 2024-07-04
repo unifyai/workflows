@@ -46,6 +46,7 @@ jobs:
 
       - name: Copy Unify to the repo
         run: |
+          ls unify-container
           mv unify-container/unify .
           mv unify-container/pyproject.toml .
           rm -rf unify-container
