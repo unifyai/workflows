@@ -49,6 +49,7 @@ jobs:
         run: |
           mv unify-container/unify .
           mv unify-container/pyproject.toml .
+          mv unify-container/README.md .
           rm -rf unify-container
           pwd
           ls
