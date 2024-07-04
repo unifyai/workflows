@@ -93,6 +93,7 @@ jobs:
 
       - name: Build docs
         run: |
+          ls
           source .venv/bin/activate
           pip install --upgrade pip
           pip install wheel setuptools
