@@ -97,7 +97,7 @@ jobs:
           source .venv/bin/activate
           pip install --upgrade pip
           pip install wheel setuptools
-          pip install --user .
+          pip install -e .
           cd .doc-builder
           export IVY_VERSION=${{ inputs.version }}
           ./make_docs_without_docker.sh ..
