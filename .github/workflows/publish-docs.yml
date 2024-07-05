@@ -51,9 +51,6 @@ jobs:
           mv unify-container/pyproject.toml .
           mv unify-container/README.md .
           rm -rf unify-container
-          pwd
-          ls
-          ls unify
            
       - name: Checkout 🛎️ Doc-builder
         uses: actions/checkout@v4
@@ -97,7 +94,6 @@ jobs:
           source .venv/bin/activate
           pip install --upgrade pip
           pip install wheel setuptools
-          pip install -e .
           cd .doc-builder
           export IVY_VERSION=${{ inputs.version }}
           ./make_docs_without_docker.sh ..
