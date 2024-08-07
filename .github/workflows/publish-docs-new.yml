@@ -108,8 +108,10 @@ jobs:
     - name: Check for changes
       id: check_changes
       run: |
+        cd docs-new
         git add .
         git diff --cached --quiet || echo "changes"
+        cd ..
 
     - name: Push changes to docs
       if: steps.check_changes.outputs.changes != ''
