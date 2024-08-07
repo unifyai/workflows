@@ -105,7 +105,14 @@ jobs:
         eval "$(ssh-agent -s)"
         ssh-add ~/.ssh/id_rsa
 
+    - name: Check for changes
+      id: check_changes
+      run: |
+        git add .
+        git diff --cached --quiet || echo "changes"
+
     - name: Push changes to docs
+      if: steps.check_changes.outputs.changes != ''
       run: |
         cd docs-new
         git remote add target git@github.com:unifyai/docs-new.git
