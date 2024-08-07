@@ -15,6 +15,7 @@ jobs:
         fetch-depth: 0
         repository: unifyai/orchestra
         path: orchestra
+        with: '${{ secrets.SSH_CLONE }}'
 
     - name: Checkout 🛎️ docs-new
       uses: actions/checkout@v4
