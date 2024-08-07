@@ -1,0 +1,116 @@
+name: Publish docs
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+    name: Publish docs
+    steps:
+    - name: Checkout 🛎️ orchestra
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        repository: unifyai/orchestra
+        path: orchestra
+
+    - name: Checkout 🛎️ docs-new
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        repository: unifyai/docs-new
+        path: docs-new
+
+    - name: Checkout 🛎️ unify
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        repository: unifyai/unify
+        path: unify
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.9"
+
+    - name: Install deps
+      run: |
+        cd orchestra
+        pip install -U pip
+        pip install poetry
+        poetry install
+        cd ..
+      env:
+        POETRY_VIRTUALENVS_CREATE: false
+
+    - name: Create OpenApi file
+      env:
+        ORCHESTRA_HOST: "0.0.0.0"
+        ORCHESTRA_DB_HOST: localhost
+        ORCHESTRA_OCTOAI_API_KEY:
+        ORCHESTRA_OPENAI_API_KEY:
+        ORCHESTRA_ANYSCALE_API_KEY:
+        ORCHESTRA_REPLICATE_API_KEY:
+        ORCHESTRA_DEEPINFRA_API_KEY:
+        ORCHESTRA_FIREWORKS_AI_API_KEY:
+        ORCHESTRA_GROQ_API_KEY:
+        ORCHESTRA_LEPTON_AI_API_KEY:
+        ORCHESTRA_ANTHROPIC_API_KEY:
+        ORCHESTRA_MISTRAL_AI_API_KEY:
+        ORCHESTRA_PERPLEXITY_AI_API_KEY:
+        ORCHESTRA_TOGETHER_AI_API_KEY:
+        ORCHESTRA_ADMIN_KEY:
+        AUTH_ACCOUNT_API_KEY:
+        AUTH_ACCOUNT_USER_ID:
+        AWS_ACCESS_KEY_ID:
+        AWS_SECRET_ACCESS_KEY:
+      run: |
+        cd orchestra
+        cp ../docs-new/mint.json mint.json
+        python generate_api_reference.py
+        rm -rf ../docs-new/api-reference
+        mv api-reference ../docs-new/api-reference
+        mv mint.json ../docs-new/mint.json
+        cd ..
+
+    - name: Generate docs for unify
+      run: |
+        python -m pip install pydoc-markdown
+        cd unify
+        cp ../docs-new/mint.json mint.json
+        mkdir output
+        mv pydoc-markdown.yml unify/pydoc-markdown.yml
+        cd unify
+        pydoc-markdown | tee ../output/result.txt
+        cd ..
+        python generate_docs.py
+        rm -rf output/result.txt
+        mv output python
+        rm -rf ../docs-new/python
+        mv python ../docs-new/python
+        mv mint.json ../docs-new/mint.json
+        cd ..
+
+    - name: Set up SSH key
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_DOCS }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
+
+    - name: Push changes to docs
+      run: |
+        cd docs-new
+        git remote add target git@github.com:unifyai/docs-new.git
+        git config --global user.name "vedpatwardhan"
+        git config --global user.email "vedpat3@gmail.com"
+        git add .
+        git commit -m "updated docs"
+        git push target main
