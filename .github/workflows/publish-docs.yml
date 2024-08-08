@@ -1,111 +1,126 @@
-run-name: Publish ${{ inputs.version }} docs
-on: 
+name: Publish docs
+on:
   workflow_call:
-      secrets:
-        SSH_GH_PAGES:
-          description: 'SSH key for GitHub Pages deployment'
-          required: true
-      inputs:
-        version:
-          description: 'Version of the docs'
-          required: false
-          default: 'dev'
-          type: string
-        package-dependencies:
-          description: 'Apt package dependencies'
-          required: false
-          default: ''
-          type: string
-        repo-name:
-          description: 'Repo display name in the URL'
-          required: false
-          default: ${{ github.event.repository.name }}
-          type: string
-        docs-repo:
-          description: 'Repo to hold the docs'
-          required: false
-          default: unifyai/docs
-          type: string
+permissions:
+  contents: write
 
 jobs:
   publish-docs:
     runs-on: ubuntu-latest
-    name: Publish ${{ inputs.version }} docs
+    name: Publish docs
     steps:
-      - name: Checkout 🛎️ ${{ inputs.repo-name }}
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
+    - name: Checkout 🛎️ orchestra
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        repository: unifyai/orchestra
+        path: orchestra
+        ssh-key: '${{ secrets.SSH_CLONE }}'
 
-      - name: Checkout 🛎️ Unify
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          repository: unifyai/unify
-          path: unify-container
+    - name: Checkout 🛎️ unify-docs
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        repository: unifyai/unify-docs
+        path: unify-docs
 
-      - name: Copy Unify to the repo
-        run: |
-          mv unify-container/unify .
-          mv unify-container/pyproject.toml .
-          mv unify-container/README.md .
-          rm -rf unify-container
-           
-      - name: Checkout 🛎️ Doc-builder
-        uses: actions/checkout@v4
-        with:
-          repository: unifyai/doc-builder
-          path: .doc-builder
+    - name: Checkout 🛎️ unify
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        repository: unifyai/unify
+        path: unify
 
-      - name: Install apt dependencies
-        if: inputs.package-dependencies != ''
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ${{ inputs.package-dependencies }}
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.9"
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        id: setup-python
-        with:
-          python-version: '3.10'
+    - name: Install deps
+      run: |
+        cd orchestra
+        pip install -U pip
+        pip install poetry
+        poetry install
+        cd ..
+      env:
+        POETRY_VIRTUALENVS_CREATE: false
 
-      - name: Get cache week key
-        id: get-cache-week-key
-        run: |
-          echo "week-key=$(date +'%Y-%V')" >> $GITHUB_OUTPUT
+    - name: Create OpenApi file
+      env:
+        ORCHESTRA_HOST: "0.0.0.0"
+        ORCHESTRA_DB_HOST: localhost
+        ORCHESTRA_OCTOAI_API_KEY:
+        ORCHESTRA_OPENAI_API_KEY:
+        ORCHESTRA_ANYSCALE_API_KEY:
+        ORCHESTRA_REPLICATE_API_KEY:
+        ORCHESTRA_DEEPINFRA_API_KEY:
+        ORCHESTRA_FIREWORKS_AI_API_KEY:
+        ORCHESTRA_GROQ_API_KEY:
+        ORCHESTRA_LEPTON_AI_API_KEY:
+        ORCHESTRA_ANTHROPIC_API_KEY:
+        ORCHESTRA_MISTRAL_AI_API_KEY:
+        ORCHESTRA_PERPLEXITY_AI_API_KEY:
+        ORCHESTRA_TOGETHER_AI_API_KEY:
+        ORCHESTRA_ADMIN_KEY:
+        AUTH_ACCOUNT_API_KEY:
+        AUTH_ACCOUNT_USER_ID:
+        AWS_ACCESS_KEY_ID:
+        AWS_SECRET_ACCESS_KEY:
+      run: |
+        cd orchestra
+        cp ../unify-docs/mint.json mint.json
+        python generate_api_reference.py
+        rm -rf ../unify-docs/api-reference
+        mv api-reference ../unify-docs/api-reference
+        mv mint.json ../unify-docs/mint.json
+        cd ..
 
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        id: cache
-        with:
-          path: ./.venv
-          key: ${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-pip-${{ steps.get-cache-week-key.outputs.week-key }}
-          restore-keys: |
-            ${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-pip-
+    - name: Generate docs for unify
+      run: |
+        python -m pip install pydoc-markdown
+        cd unify
+        cp ../unify-docs/mint.json mint.json
+        mkdir output
+        mv pydoc-markdown.yml unify/pydoc-markdown.yml
+        cd unify
+        pydoc-markdown | tee ../output/result.txt
+        cd ..
+        python generate_docs.py
+        rm -rf output/result.txt
+        mv output python
+        rm -rf ../unify-docs/python
+        mv python ../unify-docs/python
+        mv mint.json ../unify-docs/mint.json
+        cd ..
 
-      - name: Create virtual environment
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          python -m venv .venv
+    - name: Set up SSH key
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_DOCS }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
 
-      - name: Build docs
-        run: |
-          source .venv/bin/activate
-          pip install --upgrade pip
-          pip install wheel setuptools
-          cd .doc-builder
-          export IVY_VERSION=${{ inputs.version }}
-          ./make_docs_without_docker.sh ..
+    - name: Check for changes
+      id: check_changes
+      run: |
+        cd unify-docs
+        git add .
+        git diff --cached --quiet || echo "changes"
+        cd ..
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.6.1
-        with:
-          folder: docs/build
-          target-folder: "${{ inputs.version != 'dev' && format('{0}/', inputs.version) || '' }}${{ inputs.repo-name }}"
-          ssh-key: ${{ secrets.SSH_GH_PAGES }}
-          branch: main
-          git-config-name: ivy-seed
-          git-config-email: ivydl.team@gmail.com
-          repository-name: ${{ inputs.docs-repo }}
-          clean: true
+    - name: Push changes to docs
+      if: steps.check_changes.outputs.changes != ''
+      run: |
+        cd unify-docs
+        git remote add target git@github.com:unifyai/unify-docs.git
+        git config --global user.name "vedpatwardhan"
+        git config --global user.email "vedpat3@gmail.com"
+        git add .
+        git commit -m "updated docs"
+        git push target main
