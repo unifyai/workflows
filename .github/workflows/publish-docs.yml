@@ -111,11 +111,11 @@ jobs:
       run: |
         cd unify-docs
         git add .
-        git diff --cached --quiet || echo "changes"
+        git diff --cached --quiet || echo "output_value=changes" >> $GITHUB_OUTPUT
         cd ..
 
     - name: Push changes to docs
-      if: steps.check_changes.outputs.changes != ''
+      if: steps.check_changes.outputs.output_value == 'changes'
       run: |
         cd unify-docs
         git remote add target git@github.com:unifyai/unify-docs.git
