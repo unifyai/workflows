@@ -71,7 +71,7 @@ jobs:
       run: |
         cd orchestra
         cp ../unify-docs/mint.json mint.json
-        python generate_api_reference.py
+        python docs/main.py
         rm -rf ../unify-docs/api-reference
         mv api-reference ../unify-docs/api-reference
         mv mint.json ../unify-docs/mint.json
