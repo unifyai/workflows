@@ -70,11 +70,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY:
       run: |
         cd orchestra
-        cp ../unify-docs/mint.json mint.json
-        python docs/main.py
-        rm -rf ../unify-docs/api-reference
-        mv api-reference ../unify-docs/api-reference
-        mv mint.json ../unify-docs/mint.json
+        python docs/main.py -w
         cd ..
 
     - name: Generate docs for unify
