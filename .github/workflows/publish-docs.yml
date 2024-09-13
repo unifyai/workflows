@@ -77,18 +77,7 @@ jobs:
       run: |
         python -m pip install pydoc-markdown
         cd unify
-        cp ../unify-docs/mint.json mint.json
-        mkdir output
-        mv pydoc-markdown.yml unify/pydoc-markdown.yml
-        cd unify
-        pydoc-markdown | tee ../output/result.txt
-        cd ..
-        python generate_docs.py
-        rm -rf output/result.txt
-        mv output python
-        rm -rf ../unify-docs/python
-        mv python ../unify-docs/python
-        mv mint.json ../unify-docs/mint.json
+        python generate_docs.py -w
         cd ..
 
     - name: Set up SSH key
