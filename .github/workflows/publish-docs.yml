@@ -104,8 +104,8 @@ jobs:
       run: |
         cd unify-docs
         git remote add target git@github.com:unifyai/unify-docs.git
-        git config --global user.name "vedpatwardhan"
-        git config --global user.email "vedpat3@gmail.com"
+        git config --global user.name "unify-dev-bot"
+        git config --global user.email "github-bot@unify.ai"
         git add .
         git commit -m "updated docs"
         git push target main
